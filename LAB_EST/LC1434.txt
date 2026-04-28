@@ -1,0 +1,34 @@
+class Solution:
+    def numberWays(self, hats: List[List[int]]) -> int:
+        n = len(hats)
+        
+        h2p = collections.defaultdict(list)
+        for i in range(n):
+            for h in hats[i]:
+                h2p[h].append(i)
+        
+        if len(h2p) < n:
+            return 0
+        
+        mask = [1 << i for i in range(n)]
+        dp = [[0] * (1 << n) for _ in range(len(h2p) + 1)]
+        dp[0][0] = 1
+        
+        i, MOD = 1, 10**9 + 7
+        
+        while h2p:
+            _, ppl = h2p.popitem()
+            
+            for m, w in enumerate(dp[i - 1]):
+                if not w:
+                    continue
+                
+                dp[i][m] += w
+                
+                for p in ppl:
+                    if not (mask[p] & m):
+                        dp[i][m | mask[p]] += w
+            
+            i += 1
+        
+        return dp[-1][-1] % MOD
